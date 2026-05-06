@@ -28,7 +28,7 @@ export default function RotatingBadge() {
           </defs>
           <text className="text-[7.5px] font-bold uppercase tracking-[0.2em] fill-black">
             <textPath xlinkHref="#badgePath" startOffset="0%">
-              • BLACK FRIDAY 50% OFF • BLACK FRIDAY 50% OFF
+              • PREMIUM FASHION ESSENTIALS • PREMIUM FASHION ESSENTIALS
             </textPath>
           </text>
         </svg>
