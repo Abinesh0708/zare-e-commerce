@@ -5,7 +5,7 @@
 
 import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { products } from '../data/products.ts';
+import { useProducts } from '../hooks/useProducts.ts';
 import ProductCard from '../components/ProductCard.tsx';
 import { ArrowRight, Play, Star, ChevronLeft, ChevronRight, Globe, Sparkles, ShieldCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +14,9 @@ import RotatingBadge from '../components/RotatingBadge.tsx';
 export default function Home() {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // ── Fetch products from Supabase (with static fallback) ──
+  const { products, loading } = useProducts();
   
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -25,6 +28,8 @@ export default function Home() {
   };
 
   const featured = products.filter(p => p.isFeatured).slice(0, 4);
+  const trending = products.slice(4, 10);
+  const newArrivals = products.slice(0, 12);
 
   return (
     <div id="home-page" className="pt-16">
@@ -123,7 +128,7 @@ export default function Home() {
             ref={scrollContainerRef}
             className="flex space-x-4 md:space-x-8 overflow-x-auto pb-8 md:pb-12 scroll-smooth no-scrollbar snap-x snap-mandatory px-0"
           >
-            {products.slice(4, 10).map((product, i) => (
+            {trending.map((product, i) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -274,7 +279,7 @@ export default function Home() {
           </motion.div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16 md:gap-x-8 md:gap-y-20">
-            {products.slice(0, 12).map((product, i) => (
+            {newArrivals.map((product, i) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 40 }}

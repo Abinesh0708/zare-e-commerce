@@ -15,27 +15,35 @@ import Cart from './pages/Cart.tsx';
 import Checkout from './pages/Checkout.tsx';
 import Contact from './pages/Contact.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
+import AdminRouter from './admin/AdminRouter.tsx';
 
 export default function App() {
   return (
     <CartProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="min-h-screen bg-white flex flex-col font-sans">
+        <Routes>
+          {/* ── Admin CMS (/admin/*) ── no navbar/footer */}
+          <Route path="/admin/*" element={<AdminRouter />} />
 
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/product/:id" element={<Details />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+          {/* ── Storefront ── */}
+          <Route path="/*" element={
+            <div className="min-h-screen bg-white flex flex-col font-sans">
+              <Navbar />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/product/:id" element={<Details />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/contact" element={<Contact />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          } />
+        </Routes>
       </BrowserRouter>
     </CartProvider>
   );

@@ -5,41 +5,34 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { products } from '../data/products.ts';
+import { useProducts } from '../hooks/useProducts.ts';
 import ProductCard from '../components/ProductCard.tsx';
-import { Filter, SlidersHorizontal, Search } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { ProductCardSkeleton } from '../components/Skeleton.tsx';
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sortBy, setSortBy] = useState('newest');
-  const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(12);
   const [isMoreLoading, setIsMoreLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  
+
+  // ── Fetch products from Supabase (with static fallback) ──
+  const { products, loading: isLoading } = useProducts();
+
   const query = searchParams.get('q') || '';
   const category = searchParams.get('cat') || 'All';
 
-  useEffect(() => {
-    // Simulate API fetch delay
-    setIsLoading(true);
-    setVisibleCount(12); // Reset count on filter change
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [category, query, sortBy]);
+  // Reset visible count when filters change
+  useEffect(() => { setVisibleCount(12); }, [category, query, sortBy]);
 
   const allFilteredProducts = useMemo(() => {
     if (isLoading) return [];
     return products.filter(p => {
       const searchTerms = query.toLowerCase().split(' ');
       const productText = `${p.name} ${p.category} ${p.description}`.toLowerCase();
-      
       const matchesSearch = searchTerms.every(term => productText.includes(term));
       const matchesCategory = category === 'All' || p.category === category;
-      
       return matchesSearch && matchesCategory;
     }).sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
@@ -47,7 +40,7 @@ export default function Products() {
       if (sortBy === 'rating') return b.rating - a.rating;
       return 0;
     });
-  }, [query, category, sortBy, isLoading]);
+  }, [products, query, category, sortBy, isLoading]);
 
   const filteredProducts = useMemo(() => {
     return allFilteredProducts.slice(0, visibleCount);
@@ -64,14 +57,12 @@ export default function Products() {
       }
     }, { threshold: 0.1, rootMargin: '200px' });
 
-    if (sentinelRef.current) {
-      observer.observe(sentinelRef.current);
-    }
-
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [visibleCount, allFilteredProducts.length, isLoading, isMoreLoading]);
 
-  const categories = ['All', 'Shirts', 'Pants', 'Outerwear', 'Accessories'];
+  // Derive categories from live DB data
+  const categories = ['All', ...new Set(products.map(p => p.category))].sort();
 
   return (
     <div id="products-page" className="pt-24 pb-24 px-4 min-h-screen bg-white">

@@ -5,12 +5,12 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '../data/products.ts';
+import { useProduct } from '../hooks/useProducts.ts';
 import { useCart } from '../context/CartContext.tsx';
 import { Star, Truck, ShieldCheck, RotateCcw, Minus, Plus, Share2, Instagram, MessageCircle, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductDetailsSkeleton } from '../components/Skeleton.tsx';
-import { useEffect } from 'react';
+
 
 export default function Details() {
   const { id } = useParams();
@@ -19,17 +19,9 @@ export default function Details() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const product = products.find(p => p.id === id);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [id]);
+  // ── Fetch single product from Supabase (with static fallback) ──
+  const { product, loading: isLoading } = useProduct(id);
 
   if (isLoading) {
     return (
