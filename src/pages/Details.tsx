@@ -20,7 +20,7 @@ export default function Details() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [copied, setCopied] = useState(false);
 
-  // ── Fetch single product from Supabase (with static fallback) ──
+  // ── Fetch single product from PocketBase (with static fallback) ──
   const { product, loading: isLoading } = useProduct(id);
 
   if (isLoading) {

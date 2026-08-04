@@ -1,131 +1,200 @@
-import { supabase } from '../lib/supabase';
+import {
+  collection, doc,
+  getDocs, getDoc,
+  addDoc, updateDoc, deleteDoc,
+  writeBatch,
+} from 'firebase/firestore';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+  listAll,
+} from 'firebase/storage';
+import { db, storage } from './firebase';
 import { Product } from '../types';
 
-// Map Supabase row to our Product type
-function rowToProduct(row: any): Product {
+
+// ── IN-MEMORY CACHE ───────────────────────────────────────────────────────────
+// Avoids re-fetching Firestore on every page navigation within the same session
+
+let _cache: Product[] | null = null;
+let _cacheTime = 0;
+const CACHE_TTL_MS = 30_000; // 30 seconds
+
+function isCacheValid() {
+  return _cache !== null && Date.now() - _cacheTime < CACHE_TTL_MS;
+}
+
+function setCache(products: Product[]) {
+  _cache = products;
+  _cacheTime = Date.now();
+}
+
+export function invalidateCache() {
+  _cache = null;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+
+function recordToProduct(id: string, data: Record<string, any>): Product {
   return {
-    id: row.id,
-    name: row.name,
-    price: row.price,
-    originalPrice: row.original_price ?? undefined,
-    category: row.category,
-    image: row.image,
-    images: row.images || [],
-    description: row.description,
-    rating: row.rating,
-    reviews: row.reviews,
-    stockStatus: row.stock_status,
-    specs: row.specs || {},
-    isFeatured: row.is_featured || false,
+    id,
+    name:          data.name          ?? '',
+    price:         data.price         ?? 0,
+    originalPrice: data.originalPrice ?? undefined,
+    category:      data.category      ?? '',
+    image:         data.image         ?? '',
+    images:        data.images        ?? [],
+    description:   data.description   ?? '',
+    rating:        data.rating        ?? 0,
+    reviews:       data.reviews       ?? 0,
+    stockStatus:   data.stockStatus   ?? 'In Stock',
+    specs:         data.specs         ?? {},
+    isFeatured:    data.isFeatured    ?? false,
   };
 }
 
-// Map our Product type to Supabase row format
-function productToRow(product: Partial<Product>) {
-  return {
-    name: product.name,
-    price: product.price,
-    original_price: product.originalPrice ?? null,
-    category: product.category,
-    image: product.image,
-    images: product.images || [],
-    description: product.description,
-    rating: product.rating ?? 0,
-    reviews: product.reviews ?? 0,
-    stock_status: product.stockStatus ?? 'In Stock',
-    specs: product.specs || {},
-    is_featured: product.isFeatured ?? false,
-  };
+function productToRecord(product: Partial<Product>): Record<string, any> {
+  const rec: Record<string, any> = {};
+  if (product.name          !== undefined) rec.name          = product.name;
+  if (product.price         !== undefined) rec.price         = product.price;
+  if (product.originalPrice !== undefined) rec.originalPrice = product.originalPrice ?? null;
+  if (product.category      !== undefined) rec.category      = product.category;
+  if (product.image         !== undefined) rec.image         = product.image;
+  if (product.images        !== undefined) rec.images        = product.images;
+  if (product.description   !== undefined) rec.description   = product.description;
+  if (product.rating        !== undefined) rec.rating        = product.rating;
+  if (product.reviews       !== undefined) rec.reviews       = product.reviews;
+  if (product.stockStatus   !== undefined) rec.stockStatus   = product.stockStatus;
+  if (product.specs         !== undefined) rec.specs         = product.specs;
+  if (product.isFeatured    !== undefined) rec.isFeatured    = product.isFeatured;
+  return rec;
 }
 
-// ── FETCH ALL PRODUCTS ──────────────────────────────────────────────────────
+// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches all products. Returns in-memory cache if fresh (< 30s old).
+ * Sorting is done client-side to avoid needing a Firestore index.
+ */
 export async function fetchProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
+  if (isCacheValid()) return _cache!;
 
-  if (error) throw error;
-  return (data || []).map(rowToProduct);
+  // No orderBy — avoids Firestore index requirement and is faster
+  const snap = await getDocs(collection(db, 'products'));
+  const products = snap.docs
+    .map(d => recordToProduct(d.id, d.data()))
+    .sort((a, b) => a.name.localeCompare(b.name)); // client-side sort
+
+  setCache(products);
+  return products;
 }
 
-// ── FETCH SINGLE PRODUCT ────────────────────────────────────────────────────
 export async function fetchProductById(id: string): Promise<Product | null> {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return null;
-  return rowToProduct(data);
+  // Check cache first to avoid a network round-trip
+  if (isCacheValid()) {
+    const cached = _cache!.find(p => p.id === id);
+    if (cached) return cached;
+  }
+  const snap = await getDoc(doc(db, 'products', id));
+  if (!snap.exists()) return null;
+  return recordToProduct(snap.id, snap.data());
 }
 
-// ── CREATE PRODUCT ──────────────────────────────────────────────────────────
 export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
-  const { data, error } = await supabase
-    .from('products')
-    .insert([productToRow(product)])
-    .select()
-    .single();
-
-  if (error) throw error;
-  return rowToProduct(data);
+  const docRef = await addDoc(collection(db, 'products'), productToRecord(product));
+  invalidateCache();
+  return { id: docRef.id, ...product };
 }
 
-// ── UPDATE PRODUCT ──────────────────────────────────────────────────────────
 export async function updateProduct(id: string, product: Partial<Product>): Promise<Product> {
-  const { data, error } = await supabase
-    .from('products')
-    .update({ ...productToRow(product), updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return rowToProduct(data);
+  await updateDoc(doc(db, 'products', id), productToRecord(product));
+  invalidateCache();
+  // Return merged result without a second round-trip
+  const existing = _cache?.find(p => p.id === id);
+  return existing ? { ...existing, ...product, id } : (await fetchProductById(id))!;
 }
 
-// ── DELETE PRODUCT ──────────────────────────────────────────────────────────
 export async function deleteProduct(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+  await deleteDoc(doc(db, 'products', id));
+  // Remove from cache immediately — no need to re-fetch
+  if (_cache) {
+    _cache = _cache.filter(p => p.id !== id);
+  }
 }
 
-// ── UPLOAD IMAGE ────────────────────────────────────────────────────────────
+// ── IMAGES ────────────────────────────────────────────────────────────────────
+
 export async function uploadProductImage(file: File): Promise<string> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `products/${fileName}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from('product-images')
-    .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-  if (uploadError) throw uploadError;
-
-  const { data } = supabase.storage
-    .from('product-images')
-    .getPublicUrl(filePath);
-
-  return data.publicUrl;
+  const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+  await uploadBytes(storageRef, file);
+  return getDownloadURL(storageRef);
 }
 
-// ── DELETE IMAGE ────────────────────────────────────────────────────────────
 export async function deleteProductImage(url: string): Promise<void> {
-  const path = url.split('/product-images/')[1];
-  if (!path) return;
-
-  await supabase.storage.from('product-images').remove([path]);
+  try {
+    const fileRef = ref(storage, url);
+    await deleteObject(fileRef);
+  } catch (err) {
+    console.error('Failed to delete image from Firebase Storage:', err);
+  }
 }
 
-// ── SEED DATABASE from static data ─────────────────────────────────────────
+// ── MEDIA LIBRARY ─────────────────────────────────────────────────────────────
+
+export interface MediaFile {
+  id:   string;
+  name: string;
+  url:  string;
+  path: string;
+}
+
+export async function fetchMediaFiles(): Promise<MediaFile[]> {
+  const listRef = ref(storage, 'products/');
+  const result  = await listAll(listRef);
+  // Fetch all download URLs in parallel
+  const files = await Promise.all(
+    result.items.map(async item => ({
+      id:   item.fullPath,
+      name: item.name,
+      url:  await getDownloadURL(item),
+      path: item.fullPath,
+    }))
+  );
+  return files.sort((a, b) => b.name.localeCompare(a.name));
+}
+
+export async function deleteMediaFile(path: string): Promise<void> {
+  await deleteObject(ref(storage, path));
+}
+
+// ── SEED ──────────────────────────────────────────────────────────────────────
+
 export async function seedDatabase(products: Product[]): Promise<void> {
-  const rows = products.map(p => ({ ...productToRow(p), id: p.id }));
-  const { error } = await supabase.from('products').upsert(rows, { onConflict: 'id' });
-  if (error) throw error;
+  const BATCH_SIZE = 400;
+  for (let i = 0; i < products.length; i += BATCH_SIZE) {
+    const batch = writeBatch(db);
+    const chunk = products.slice(i, i + BATCH_SIZE);
+    for (const p of chunk) {
+      const docRef = doc(collection(db, 'products'));
+      batch.set(docRef, productToRecord(p));
+    }
+    await batch.commit();
+  }
+  invalidateCache();
+}
+
+// ── CLEAR DATABASE ────────────────────────────────────────────────────────────
+
+export async function clearDatabase(): Promise<void> {
+  const snap  = await getDocs(collection(db, 'products'));
+  const BATCH_SIZE = 400;
+  const docs  = snap.docs;
+  for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+    const batch = writeBatch(db);
+    docs.slice(i, i + BATCH_SIZE).forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  }
+  invalidateCache();
 }

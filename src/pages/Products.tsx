@@ -17,7 +17,7 @@ export default function Products() {
   const [isMoreLoading, setIsMoreLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // ── Fetch products from Supabase (with static fallback) ──
+  // ── Fetch products from PocketBase (with static fallback) ──
   const { products, loading: isLoading } = useProducts();
 
   const query = searchParams.get('q') || '';
@@ -62,7 +62,7 @@ export default function Products() {
   }, [visibleCount, allFilteredProducts.length, isLoading, isMoreLoading]);
 
   // Derive categories from live DB data
-  const categories = ['All', ...new Set(products.map(p => p.category))].sort();
+  const categories = (['All', ...Array.from(new Set(products.map(p => p.category)))].sort()) as string[];
 
   return (
     <div id="products-page" className="pt-24 pb-24 px-4 min-h-screen bg-white">

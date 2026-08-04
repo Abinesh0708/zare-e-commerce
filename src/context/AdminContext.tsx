@@ -9,7 +9,7 @@ interface AdminContextType {
 const AdminContext = createContext<AdminContextType | null>(null);
 
 // Simple password gate - change this or move to env variable
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin@zare##';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Admin@123';
 
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {

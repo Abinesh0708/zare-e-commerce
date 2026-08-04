@@ -15,7 +15,7 @@ export default function Home() {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // ── Fetch products from Supabase (with static fallback) ──
+  // ── Fetch products from PocketBase (with static fallback) ──
   const { products, loading } = useProducts();
   
   const scroll = (direction: 'left' | 'right') => {
