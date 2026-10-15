@@ -4,13 +4,12 @@
  */
 
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useProduct } from '../hooks/useProducts.ts';
 import { useCart } from '../context/CartContext.tsx';
-import { Star, Truck, ShieldCheck, RotateCcw, Minus, Plus, Share2, Instagram, MessageCircle, Copy } from 'lucide-react';
+import { Star, Minus, Plus, Copy, Check, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductDetailsSkeleton } from '../components/Skeleton.tsx';
-
 
 export default function Details() {
   const { id } = useParams();
@@ -25,7 +24,7 @@ export default function Details() {
 
   if (isLoading) {
     return (
-      <div className="pt-24 pb-24 px-4 bg-white">
+      <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] min-h-svh">
         <div className="max-w-7xl mx-auto">
           <ProductDetailsSkeleton />
         </div>
@@ -35,9 +34,20 @@ export default function Details() {
 
   if (!product) {
     return (
-      <div className="pt-24 text-center">
-        <h1 className="text-4xl font-black">Product Not Found</h1>
-        <button onClick={() => navigate('/products')} className="mt-4 underline">Back to Shop</button>
+      <div className="pt-32 pb-24 text-center px-4 min-h-svh bg-[#F7F6F2]">
+        <h1 className="font-display font-bold text-3xl uppercase tracking-tight text-[#111111]">
+          Specimen Not Located
+        </h1>
+        <p className="text-sm text-[#6B665F] mt-2 mb-6">
+          The requested archive item may have been de-listed or re-catalogued.
+        </p>
+        <Link 
+          to="/products" 
+          className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.14em] bg-[#111111] text-[#F7F6F2] px-6 py-3"
+        >
+          <ArrowLeft size={14} className="mr-2" />
+          Return to Collections
+        </Link>
       </div>
     );
   }
@@ -48,138 +58,201 @@ export default function Details() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
+
   return (
-    <div id="product-detail" className="pt-24 pb-24 px-4 bg-white">
-      <div className="max-w-7xl mx-auto space-y-12 lg:space-y-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Images */}
-          <div className="space-y-4">
-            <div className="aspect-[3/4] rounded-3xl overflow-hidden bg-gray-100 relative">
+    <div id="product-detail" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111]">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center space-x-2 text-xs uppercase tracking-[0.12em] text-[#736E67] mb-8">
+          <Link to="/" className="hover:text-[#111111]">Home</Link>
+          <span>/</span>
+          <Link to="/products" className="hover:text-[#111111]">Collections</Link>
+          <span>/</span>
+          <Link to={`/products?cat=${product.category}`} className="hover:text-[#111111]">{product.category}</Link>
+          <span>/</span>
+          <span className="text-[#111111] font-semibold truncate max-w-[200px]">{product.name}</span>
+        </nav>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Multi-Angle Studio Photography */}
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
+            
+            {/* Thumbnail Column */}
+            {imagesList.length > 1 && (
+              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto no-scrollbar shrink-0">
+                {imagesList.map((img, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setSelectedImage(i)}
+                    className={`relative w-20 md:w-24 aspect-[3/4] bg-[#ECE8E1] overflow-hidden transition-opacity duration-200 ${
+                      selectedImage === i ? 'opacity-100 ring-2 ring-[#111111]' : 'opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`Angle ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Main Stage Image */}
+            <div className="flex-1 aspect-[3/4] bg-[#ECE8E1] overflow-hidden relative">
               <AnimatePresence mode="wait">
                 <motion.img 
                   key={selectedImage}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  src={product.images[selectedImage] || product.image}
+                  transition={{ duration: 0.3 }}
+                  src={imagesList[selectedImage] || product.image}
+                  alt={product.name}
                   className="w-full h-full object-cover"
                 />
               </AnimatePresence>
-            </div>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {product.images.map((img, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => setSelectedImage(i)}
-                  className={`relative w-24 h-32 rounded-xl overflow-hidden border-2 transition-all ${selectedImage === i ? 'border-black' : 'border-transparent opacity-60'}`}
-                >
-                  <img src={img} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="flex flex-col">
-            <nav className="flex items-center space-x-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
-              <button onClick={() => navigate('/')}>Home</button>
-              <span>/</span>
-              <button onClick={() => navigate('/products')}>Collections</button>
-              <span>/</span>
-              <span className="text-black">{product.category}</span>
-            </nav>
-
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4 leading-tight">{product.name}</h1>
-            
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="flex items-center text-amber-400">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} size={20} className={i < Math.floor(product.rating) ? 'fill-current' : ''} />
-                ))}
-              </div>
-              <span className="text-sm font-bold text-gray-400">({product.reviews} reviews)</span>
-              <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${product.stockStatus === 'In Stock' ? 'bg-lime-100 text-lime-700' : 'bg-red-100 text-red-700'}`}>
-                {product.stockStatus}
-              </span>
-            </div>
-
-            <div className="flex items-baseline space-x-4 mb-10">
-              <span className="text-4xl font-black">₹{product.price}</span>
+              
               {product.originalPrice && (
-                <span className="text-2xl text-gray-300 line-through font-bold">₹{product.originalPrice}</span>
+                <div className="absolute top-4 left-4 bg-[#111111] text-[#F7F6F2] text-[10px] font-semibold uppercase tracking-[0.14em] px-3 py-1">
+                  Archive Sale
+                </div>
               )}
             </div>
 
-            <p className="text-gray-500 text-lg leading-relaxed mb-10">
-              {product.description}
-            </p>
+          </div>
 
-            {/* Quantity */}
-            <div className="flex items-center space-x-6 mb-8">
-              <span className="font-bold uppercase text-xs tracking-widest">Quantity</span>
-              <div className="flex items-center border-2 border-black rounded-full px-4 py-2 space-x-6">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="hover:text-lime-500"><Minus size={18} /></button>
-                <span className="font-bold w-4 text-center">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="hover:text-lime-500"><Plus size={18} /></button>
+          {/* Right Column: Garment Specifications & Actions */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#736E67]">
+                <span>{product.category}</span>
+                <span className="font-semibold text-[#111111] flex items-center">
+                  <Star size={12} className="fill-[#111111] mr-1" />
+                  {product.rating} ({product.reviews} reviews)
+                </span>
               </div>
+
+              <h1 className="font-display font-extrabold text-3xl sm:text-4xl uppercase tracking-[-0.03em] text-[#111111] leading-tight">
+                {product.name}
+              </h1>
+
+              {/* Price Display */}
+              <div className="flex items-baseline space-x-3 pt-1">
+                <span className="font-display font-bold text-3xl text-[#111111]">
+                  ₹{product.price.toLocaleString('en-IN')}
+                </span>
+                {product.originalPrice && (
+                  <span className="text-[#8E8A82] line-through text-lg">
+                    ₹{product.originalPrice.toLocaleString('en-IN')}
+                  </span>
+                )}
+                <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 ml-2 ${
+                  product.stockStatus === 'In Stock' 
+                    ? 'bg-[#EFECE6] text-[#111111]' 
+                    : 'bg-[#A64B2A] text-[#F7F6F2]'
+                }`}>
+                  {product.stockStatus}
+                </span>
+              </div>
+
+              <p className="text-sm sm:text-base text-[#6B665F] leading-relaxed pt-2">
+                {product.description}
+              </p>
             </div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button 
-                onClick={() => addToCart(product, quantity)}
-                className="w-full sm:flex-1 bg-black text-white py-5 rounded-full font-black uppercase text-sm tracking-widest hover:bg-lime-500 hover:text-black transition-all"
-              >
-                Add to Cart
-              </button>
-              <button 
-                onClick={() => { addToCart(product, quantity); navigate('/cart'); }}
-                className="w-full sm:flex-1 bg-lime-400 text-black py-5 rounded-full font-black uppercase text-sm tracking-widest hover:bg-black hover:text-white transition-all shadow-lg text-center"
-              >
-                Buy Now
-              </button>
-            </div>
-
-            {/* Social Share */}
-            <div className="flex items-center space-x-6 mb-12 border-t border-gray-100 pt-8">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Share:</span>
-              <div className="flex items-center space-x-4">
-                <button className="p-2 hover:text-lime-500 transition-colors"><MessageCircle size={20} /></button>
-                <button className="p-2 hover:text-lime-500 transition-colors"><Instagram size={20} /></button>
-                <button onClick={handleCopy} className="p-2 hover:text-lime-500 transition-colors flex items-center space-x-2">
-                  <Copy size={18} />
-                  {copied && <span className="text-[10px] font-black uppercase text-lime-600">Copied!</span>}
+            {/* Quantity Selector */}
+            <div className="pt-6 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-[0.14em] font-semibold text-[#736E67]">
+                Quantity
+              </span>
+              <div className="flex items-center bg-[#EFECE6]">
+                <button 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="px-3.5 py-2 hover:bg-[#E5E1D8] text-[#111111] transition-colors"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="w-10 text-center font-bold text-sm text-[#111111]">
+                  {quantity}
+                </span>
+                <button 
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="px-3.5 py-2 hover:bg-[#E5E1D8] text-[#111111] transition-colors"
+                  aria-label="Increase quantity"
+                >
+                  <Plus size={14} />
                 </button>
               </div>
             </div>
 
-            {/* Specs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-t border-gray-100">
-              {Object.entries(product.specs).map(([label, val]) => (
-                <div key={label}>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">{label}</span>
-                  <span className="font-bold">{val}</span>
-                </div>
-              ))}
+            {/* Purchase CTA Buttons */}
+            <div className="space-y-3 pt-2">
+              <button 
+                onClick={() => addToCart(product, quantity)}
+                className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors flex items-center justify-center space-x-2"
+              >
+                <span>Add to Shopping Bag</span>
+              </button>
+              <button 
+                onClick={() => { addToCart(product, quantity); navigate('/checkout'); }}
+                className="w-full bg-[#EFECE6] text-[#111111] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#E5E1D8] transition-colors"
+              >
+                Direct Checkout
+              </button>
             </div>
 
-            {/* Perks */}
-            <div className="grid grid-cols-3 gap-4 pt-12">
-              <div className="text-center p-4 rounded-2xl bg-gray-50 space-y-2">
-                <Truck size={24} className="mx-auto text-lime-500" />
-                <p className="text-[10px] font-bold uppercase">Free Shipping</p>
+            {/* Garment Specifications Table */}
+            {product.specs && (
+              <div className="pt-8 space-y-3">
+                <span className="text-[11px] uppercase tracking-[0.14em] font-semibold text-[#736E67] block">
+                  Garment Specifications
+                </span>
+                <div className="bg-[#EFECE6] p-5 space-y-2.5 text-xs">
+                  {Object.entries(product.specs).map(([key, val]) => (
+                    <div key={key} className="flex justify-between">
+                      <span className="text-[#736E67] uppercase tracking-[0.06em]">{key}</span>
+                      <span className="font-semibold text-[#111111] text-right">{val}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="text-center p-4 rounded-2xl bg-gray-50 space-y-2">
-                <ShieldCheck size={24} className="mx-auto text-lime-500" />
-                <p className="text-[10px] font-bold uppercase">Secure Pay</p>
+            )}
+
+            {/* Provenance Reassurances & Share */}
+            <div className="pt-8 flex items-center justify-between text-xs text-[#736E67]">
+              <div className="space-y-1">
+                <p>• Complimentary Express Shipping within India</p>
+                <p>• 14-Day Atelier Exchanges & Returns</p>
               </div>
-              <div className="text-center p-4 rounded-2xl bg-gray-50 space-y-2">
-                <RotateCcw size={24} className="mx-auto text-lime-500" />
-                <p className="text-[10px] font-bold uppercase">Easy Return</p>
-              </div>
+
+              <button 
+                onClick={handleCopy}
+                className="flex items-center space-x-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111111] hover:underline"
+              >
+                {copied ? <Check size={14} className="text-green-700" /> : <Copy size={14} />}
+                <span>{copied ? 'Link Copied' : 'Share Specimen'}</span>
+              </button>
             </div>
+
           </div>
         </div>
+
+      </div>
+
+      {/* Mobile Sticky Add to Bag Bar */}
+      <div data-ui="mobile-add-bar" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F6F2] p-3 border-t border-[#E0DDD6] flex items-center justify-between gap-3 shadow-lg">
+        <div className="flex flex-col pl-1">
+          <span className="font-bold text-sm text-[#111111]">₹{product.price.toLocaleString('en-IN')}</span>
+          <span className="text-[10px] text-[#736E67] uppercase tracking-[0.08em]">{product.stockStatus}</span>
+        </div>
+        <button 
+          onClick={() => addToCart(product, quantity)}
+          className="flex-1 bg-[#111111] text-[#F7F6F2] py-3.5 px-4 text-xs font-semibold uppercase tracking-[0.14em] flex items-center justify-center space-x-2 active:bg-[#2B2B2B]"
+        >
+          <span>Add to Bag</span>
+        </button>
       </div>
     </div>
   );

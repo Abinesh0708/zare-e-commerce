@@ -3,101 +3,178 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, MessageCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { Mail, Phone, MapPin, Check } from 'lucide-react';
 
 export default function Contact() {
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', subject: 'Inquiry', message: '' });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Message sent successfully!');
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setFormData({ name: '', email: '', subject: 'Inquiry', message: '' });
+    }, 4000);
   };
 
   return (
-    <div id="contact-page" className="pt-24 pb-24 px-4 bg-white">
+    <div id="contact-page" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111] min-h-svh">
       <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-16 md:mb-24 max-w-2xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Get in Touch</h1>
-          <p className="text-gray-500 text-base md:text-lg px-4 sm:px-0">
-            Have questions about our collections or an existing order? Our team is here to help you redefine your style.
+        
+        {/* Editorial Header */}
+        <header className="mb-14 pb-4 max-w-3xl">
+          <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#736E67] block mb-2">
+            Correspondence
+          </span>
+          <h1 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-[-0.04em] text-[#111111]">
+            Atelier & Client Care
+          </h1>
+          <p className="text-sm sm:text-base text-[#6B665F] mt-4 leading-relaxed">
+            For inquiries regarding textile provenance, sizing consultations, private showroom appointments, or existing orders.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
-          {/* Contact Info */}
-          <div className="space-y-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-gray-50 p-8 rounded-3xl space-y-4">
-                <div className="w-12 h-12 bg-lime-400 rounded-full flex items-center justify-center">
-                  <Mail size={24} />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">Email Us</h4>
-                  <p className="text-sm text-gray-500">hello@zare.com</p>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Direct Atelier Information */}
+          <div className="lg:col-span-5 space-y-8">
+            
+            <div className="space-y-4">
+              <span className="text-[11px] uppercase tracking-[0.14em] font-semibold text-[#736E67] block">
+                Direct Channels
+              </span>
+
+              <div className="bg-[#EFECE6] p-6 space-y-2">
+                <span className="text-[10px] uppercase tracking-[0.12em] text-[#736E67] font-semibold block">
+                  Client Correspondence
+                </span>
+                <a href="mailto:hello@zare.com" className="font-display font-bold text-lg text-[#111111] hover:underline block">
+                  hello@zare.com
+                </a>
+                <p className="text-xs text-[#6B665F]">
+                  Response window: within 24 atelier hours.
+                </p>
               </div>
-              <div className="bg-gray-50 p-8 rounded-3xl space-y-4">
-                <div className="w-12 h-12 bg-lime-400 rounded-full flex items-center justify-center">
-                  <Phone size={24} />
-                </div>
-                <div>
-                  <h4 className="font-bold mb-1">Call Us</h4>
-                  <p className="text-sm text-gray-500">+1 (234) 567-890</p>
-                </div>
+
+              <div className="bg-[#EFECE6] p-6 space-y-2">
+                <span className="text-[10px] uppercase tracking-[0.12em] text-[#736E67] font-semibold block">
+                  Telephone & Atelier Line
+                </span>
+                <span className="font-display font-bold text-lg text-[#111111] block">
+                  +1 (234) 567-890
+                </span>
+                <p className="text-xs text-[#6B665F]">
+                  Monday to Friday, 09:00 – 18:00 EST.
+                </p>
               </div>
             </div>
 
-            <div className="bg-black text-white p-12 rounded-[3.5rem] relative overflow-hidden">
-              <div className="relative z-10 space-y-6">
-                <h3 className="text-3xl font-black tracking-tight">Visit Our Showroom</h3>
-                <div className="flex items-start space-x-4">
-                  <MapPin className="text-lime-400 mt-1" />
-                  <p className="text-gray-300">
-                    123 Fashion Ave, Fashion District<br />
-                    New York, NY 10001
-                  </p>
-                </div>
-                <div className="pt-8 flex space-x-6">
-                  <Instagram className="hover:text-lime-400 cursor-pointer transition-colors" />
-                  <Facebook className="hover:text-lime-400 cursor-pointer transition-colors" />
-                  <Twitter className="hover:text-lime-400 cursor-pointer transition-colors" />
-                  <MessageCircle className="hover:text-lime-400 cursor-pointer transition-colors" />
-                </div>
+            {/* Showroom Details */}
+            <div className="bg-[#0E0E0E] text-[#F7F6F2] p-8 space-y-4">
+              <span className="text-[10px] uppercase tracking-[0.16em] text-[#D4C3B3] font-semibold block">
+                Physical Atelier
+              </span>
+              <h3 className="font-display font-bold text-2xl uppercase tracking-tight">
+                New York Showroom
+              </h3>
+              <p className="text-xs text-[#A39E96] leading-relaxed">
+                123 Fashion Ave, Fashion District<br />
+                New York, NY 10001
+              </p>
+              <div className="pt-2 text-xs text-[#7A756D]">
+                Open for bespoke consultations and archive viewing by prior appointment.
               </div>
-              {/* Abstract Shape */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-lime-400/20 blur-3xl -translate-y-1/2 translate-x-1/2 rounded-full"></div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="aspect-video w-full bg-gray-100 rounded-[2.5rem] flex items-center justify-center overflow-hidden border border-gray-100">
-              <div className="text-center space-y-4">
-                <MapPin size={40} className="mx-auto text-gray-300" />
-                <span className="text-xs font-black uppercase text-gray-400 tracking-widest">Interactive Map Placeholder</span>
-              </div>
-            </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-gray-50 p-12 rounded-[3.5rem]">
-            <h3 className="text-3xl font-black mb-10 tracking-tight">Send a Message</h3>
+          {/* Right Column: Correspondence Form */}
+          <div className="lg:col-span-7 bg-[#EFECE6] p-8 sm:p-10">
+            <h3 className="font-display font-bold text-2xl uppercase tracking-tight text-[#111111] mb-2">
+              Send a Dispatch
+            </h3>
+            <p className="text-xs text-[#6B665F] mb-8">
+              Fill out the form below. A member of our client care atelier will review and respond promptly.
+            </p>
+
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-4">Full Name</label>
-                <input required placeholder="Enter your name" className="w-full px-8 py-4 rounded-2xl border-2 border-transparent bg-white focus:border-black outline-none transition-all font-medium" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Your Name *
+                  </label>
+                  <input 
+                    required 
+                    placeholder="Full name" 
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#F7F6F2] text-sm text-[#111111] outline-none transition-colors" 
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Email Address *
+                  </label>
+                  <input 
+                    required 
+                    type="email" 
+                    placeholder="name@domain.com" 
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#F7F6F2] text-sm text-[#111111] outline-none transition-colors" 
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-4">Email Address</label>
-                <input required type="email" placeholder="email@example.com" className="w-full px-8 py-4 rounded-2xl border-2 border-transparent bg-white focus:border-black outline-none transition-all font-medium" />
+
+              <div>
+                <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                  Subject *
+                </label>
+                <select
+                  value={formData.subject}
+                  onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#F7F6F2] text-sm text-[#111111] outline-none transition-colors cursor-pointer"
+                >
+                  <option value="Inquiry">General Inquiry</option>
+                  <option value="Order">Existing Order Inquiry</option>
+                  <option value="Sizing">Sizing & Material Consultation</option>
+                  <option value="Appointment">Showroom Appointment</option>
+                </select>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-4">Your Message</label>
-                <textarea required rows={5} placeholder="How can we help?" className="w-full px-8 py-4 rounded-2xl border-2 border-transparent bg-white focus:border-black outline-none transition-all font-medium resize-none"></textarea>
+
+              <div>
+                <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                  Your Message *
+                </label>
+                <textarea 
+                  required 
+                  rows={6} 
+                  placeholder="How may our atelier assist you?" 
+                  value={formData.message}
+                  onChange={e => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#F7F6F2] text-sm text-[#111111] outline-none transition-colors resize-none" 
+                />
               </div>
-              <button className="w-full bg-black text-white py-5 rounded-full font-black uppercase text-sm tracking-widest hover:bg-lime-500 hover:text-black transition-all shadow-lg">
-                Send Message
+
+              <button 
+                type="submit" 
+                className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors"
+              >
+                Transmit Message
               </button>
+
+              {submitted && (
+                <div className="p-3 bg-[#F7F6F2] text-xs font-semibold text-[#111111] flex items-center justify-center space-x-2">
+                  <Check size={16} className="text-green-700" />
+                  <span>Your message has been transmitted to our atelier.</span>
+                </div>
+              )}
             </form>
           </div>
+
         </div>
       </div>
     </div>

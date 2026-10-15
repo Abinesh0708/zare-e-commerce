@@ -28,7 +28,7 @@ export default function App() {
 
           {/* ── Storefront ── */}
           <Route path="/*" element={
-            <div className="min-h-screen bg-white flex flex-col font-sans">
+            <div className="min-h-svh bg-[#F7F6F2] text-[#111111] flex flex-col font-sans">
               <Navbar />
               <main className="flex-grow">
                 <Routes>

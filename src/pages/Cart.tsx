@@ -15,67 +15,125 @@ export default function Cart() {
   const { cart, updateQuantity, removeFromCart, totalPrice } = useCart();
   const navigate = useNavigate();
 
-  const suggested = products.slice(5, 9);
+  const suggested = products.slice(0, 4);
 
   if (cart.length === 0) {
     return (
-      <div className="pt-32 pb-24 text-center">
-        <div className="max-w-md mx-auto space-y-8">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-            <ShoppingBag size={40} className="text-gray-300" />
+      <div className="pt-36 pb-32 text-center px-4 bg-[#F7F6F2] min-h-svh text-[#111111]">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="w-16 h-16 bg-[#EFECE6] flex items-center justify-center mx-auto text-[#736E67]">
+            <ShoppingBag size={28} />
           </div>
-          <h1 className="text-4xl font-black tracking-tight">Your cart is empty.</h1>
-          <p className="text-gray-500">Looks like you haven't added anything to your cart yet.</p>
-          <Link to="/products" className="inline-block bg-black text-white px-10 py-4 rounded-full font-bold uppercase tracking-tight hover:bg-lime-500 transition-colors">
-            Start Shopping
-          </Link>
+          <h1 className="font-display font-bold text-3xl uppercase tracking-tight text-[#111111]">
+            Your Bag is Empty
+          </h1>
+          <p className="text-sm text-[#6B665F]">
+            You have not added any pieces to your shopping bag yet. Explore our current season archive.
+          </p>
+          <div className="pt-2">
+            <Link 
+              to="/products" 
+              className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.14em] bg-[#111111] text-[#F7F6F2] px-8 py-4 hover:bg-[#2B2B2B] transition-colors"
+            >
+              <span>Explore Collections</span>
+              <ArrowRight size={14} className="ml-2" />
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div id="cart-page" className="pt-24 pb-24 px-4 bg-white">
+    <div id="cart-page" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111] min-h-svh">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-black mb-12 tracking-tighter uppercase">Shopping Cart</h1>
+        <header className="mb-10 pb-4 flex justify-between items-end">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#736E67] block mb-1">
+              Order Review
+            </span>
+            <h1 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-[-0.03em] text-[#111111]">
+              Shopping Bag
+            </h1>
+          </div>
+          <span className="text-xs uppercase tracking-[0.1em] text-[#736E67] font-semibold">
+            {cart.reduce((sum, item) => sum + item.quantity, 0)} Items
+          </span>
+        </header>
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          {/* Cart Items */}
-          <div className="lg:col-span-8 space-y-8">
+          
+          {/* Cart Items Column */}
+          <div className="lg:col-span-8 space-y-4">
             {cart.map((item) => (
               <motion.div 
                 key={item.id}
                 layout
-                className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 pb-8 border-b border-gray-100"
+                className="p-4 sm:p-6 bg-[#EFECE6] flex flex-row items-start space-x-3.5 sm:space-x-6"
               >
-                <div className="w-full sm:w-24 h-48 sm:h-32 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                  <img src={item.image} className="w-full h-full object-cover" />
+                <div className="w-20 sm:w-28 aspect-[3/4] bg-[#ECE8E1] overflow-hidden shrink-0">
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
-                <div className="flex-1 min-w-0 w-full">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg truncate pr-4">{item.name}</h3>
-                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500">
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-400 font-bold uppercase mb-4">{item.category}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center border border-gray-200 rounded-full px-3 py-1 space-x-4">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14} /></button>
-                      <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14} /></button>
+
+                <div className="flex-1 min-w-0 w-full flex flex-col justify-between self-stretch">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <Link 
+                        to={`/product/${item.id}`} 
+                        className="font-display font-bold text-sm sm:text-lg text-[#111111] hover:underline line-clamp-1 pr-2"
+                      >
+                        {item.name}
+                      </Link>
+                      <button 
+                        onClick={() => removeFromCart(item.id)} 
+                        className="text-[#8E8A82] hover:text-[#111111] transition-colors p-1 shrink-0"
+                        aria-label={`Remove ${item.name} from bag`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <span className="font-black text-xl">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#736E67] block mt-0.5">
+                      {item.category}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-3 mt-auto">
+                    {/* Quantity Stepper */}
+                    <div className="flex items-center bg-[#F7F6F2]">
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="px-2 py-1 text-[#111111] hover:bg-[#E5E1D8] transition-colors"
+                      >
+                        <Minus size={11} />
+                      </button>
+                      <span className="w-7 text-center font-bold text-xs text-[#111111]">
+                        {item.quantity}
+                      </span>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="px-2 py-1 text-[#111111] hover:bg-[#E5E1D8] transition-colors"
+                      >
+                        <Plus size={11} />
+                      </button>
+                    </div>
+
+                    <span className="font-display font-bold text-sm sm:text-lg text-[#111111]">
+                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                    </span>
                   </div>
                 </div>
               </motion.div>
             ))}
 
-            {/* Suggestions */}
-            <div className="mt-24">
-              <h3 className="text-2xl font-black mb-8">You may also like</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {/* Suggestions / Complementary Pieces */}
+            <div className="pt-12 sm:pt-16">
+              <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#736E67] block mb-2">
+                Curated Suggestions
+              </span>
+              <h3 className="font-display font-bold text-xl sm:text-2xl uppercase tracking-tight text-[#111111] mb-6 sm:mb-8">
+                Complementary Archive Items
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
                 {suggested.map(p => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -83,38 +141,50 @@ export default function Cart() {
             </div>
           </div>
 
-          {/* Summary */}
-          <div className="lg:col-span-4 translate-y-2">
-            <div className="bg-gray-50 p-8 rounded-[2.5rem] sticky top-24">
-              <h3 className="text-2xl font-black mb-8 border-b border-gray-200 pb-4">Order Summary</h3>
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between font-medium">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
+          {/* Order Summary Column */}
+          <div className="lg:col-span-4">
+            <div className="bg-[#EFECE6] p-8 sticky top-28 space-y-6">
+              <h3 className="font-display font-bold text-xl uppercase tracking-tight text-[#111111] pb-2">
+                Summary
+              </h3>
+              
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Subtotal</span>
+                  <span className="text-[#111111] font-semibold">₹{totalPrice.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between font-medium">
-                  <span className="text-gray-500">Shipping</span>
-                  <span className="text-lime-600 font-bold">FREE</span>
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Atelier Dispatch</span>
+                  <span className="text-[#111111] font-semibold uppercase tracking-[0.08em] text-xs">Complimentary</span>
                 </div>
-                <div className="flex justify-between font-black text-2xl pt-4 border-t border-gray-200">
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Applicable Taxes</span>
+                  <span className="text-[#111111] font-semibold text-xs">Included</span>
+                </div>
+                
+                <div className="flex justify-between font-display font-bold text-2xl text-[#111111] pt-6">
                   <span>Total</span>
                   <span>₹{totalPrice.toLocaleString('en-IN')}</span>
                 </div>
               </div>
-              <button 
-                onClick={() => navigate('/checkout')}
-                className="w-full bg-black text-white py-5 rounded-full font-black uppercase text-sm tracking-widest hover:bg-lime-500 hover:text-black transition-all flex items-center justify-center space-x-3"
-              >
-                <span>Checkout</span>
-                <ArrowRight size={18} />
-              </button>
-              <div className="mt-8 text-center">
-                <Link to="/products" className="text-xs font-bold underline underline-offset-4 hover:text-lime-600 transition-colors">
-                  Continue Shopping
-                </Link>
+
+              <div className="pt-2">
+                <button 
+                  onClick={() => navigate('/checkout')}
+                  className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors"
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+
+              <div className="text-[11px] text-[#736E67] space-y-1.5 pt-4">
+                <p>• Secured 256-bit payment processing</p>
+                <p>• 14-day return and exchange policy</p>
+                <p>• Sourced under fair atelier standards</p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

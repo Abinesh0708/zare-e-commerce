@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingBag, Search, Menu, X, ArrowUpRight } from 'lucide-react';
 import { useCart } from '../context/CartContext.tsx';
 import { motion, AnimatePresence } from 'motion/react';
 import { products } from '../data/products.ts';
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const { totalItems } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (searchQuery.length > 1) {
@@ -38,43 +39,82 @@ export default function Navbar() {
     navigate(`/products?q=${encodeURIComponent(q)}`);
   };
 
+  const navLinks = [
+    { label: 'Collection', path: '/products' },
+    { label: 'Shirts', path: '/products?cat=Shirts' },
+    { label: 'Outerwear', path: '/products?cat=Outerwear' },
+    { label: 'Contact', path: '/contact' },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Left: Mobile Menu */}
-        <button 
-          id="mobile-menu-btn"
-          className="md:hidden p-2" 
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#F7F6F2] transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        
+        {/* Left: Mobile Menu & Desktop Navigation */}
+        <div className="flex items-center space-x-8">
+          <button 
+            id="mobile-menu-btn"
+            className="md:hidden p-2 text-[#111111] hover:text-[#6B665F] transition-colors" 
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
 
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-black tracking-tighter text-black uppercase">
-          ZARE
-        </Link>
-
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-sm font-medium hover:text-lime-500 transition-colors">Home</Link>
-          <Link to="/products" className="text-sm font-medium hover:text-lime-500 transition-colors">Shop</Link>
-          <Link to="/contact" className="text-sm font-medium hover:text-lime-500 transition-colors">Contact</Link>
+          <nav className="hidden md:flex items-center space-x-8 text-[13px] tracking-[0.08em] uppercase font-semibold text-[#6B665F]">
+            {navLinks.map((link) => {
+              const isActive = location.pathname + location.search === link.path;
+              return (
+                <Link 
+                  key={link.path}
+                  to={link.path} 
+                  className={`transition-colors py-1 relative ${isActive ? 'text-[#111111]' : 'hover:text-[#111111]'}`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#111111]" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center space-x-2 md:space-x-4">
+        {/* Center: Brand Wordmark (Monumental Editorial Presence) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+          <Link 
+            to="/" 
+            className="font-display font-extrabold text-2xl sm:text-3xl tracking-[-0.04em] text-[#111111] uppercase hover:opacity-85 transition-opacity"
+          >
+            ZARE
+          </Link>
+        </div>
+
+        {/* Right: Search & Cart Actions */}
+        <div className="flex items-center space-x-3 sm:space-x-5">
           <button 
             id="search-trigger"
             onClick={() => setIsSearchOpen(true)} 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 text-[#111111] hover:text-[#6B665F] transition-colors flex items-center space-x-2"
+            aria-label="Search collection"
           >
-            <Search size={22} />
+            <Search size={20} strokeWidth={1.75} />
+            <span className="hidden lg:inline text-[12px] uppercase tracking-[0.08em] font-medium text-[#6B665F]">
+              Search
+            </span>
           </button>
-          <Link to="/cart" className="p-2 hover:bg-gray-100 rounded-full transition-colors relative">
-            <ShoppingBag size={22} />
+
+          <Link 
+            to="/cart" 
+            className="p-2 text-[#111111] hover:text-[#6B665F] transition-colors relative flex items-center space-x-2"
+            aria-label="Shopping bag"
+          >
+            <ShoppingBag size={20} strokeWidth={1.75} />
+            <span className="hidden sm:inline text-[12px] uppercase tracking-[0.08em] font-medium text-[#6B665F]">
+              Bag
+            </span>
             {totalItems > 0 && (
-              <span className="absolute top-0 right-0 bg-lime-400 text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+              <span className="bg-[#111111] text-[#F7F6F2] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ml-1">
                 {totalItems}
               </span>
             )}
@@ -82,7 +122,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -91,40 +131,83 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[70]"
+              className="md:hidden fixed inset-0 bg-black/50 z-[70]"
             />
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white p-8 space-y-12 shadow-2xl z-[80] flex flex-col"
+              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
+              className="md:hidden fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#F7F6F2] p-8 space-y-10 z-[80] flex flex-col justify-between"
             >
-              <div className="flex justify-between items-center">
-                <Link to="/" onClick={() => setIsOpen(false)} className="text-2xl font-black tracking-tighter uppercase">ZARE</Link>
-                <button onClick={() => setIsOpen(false)} className="p-2"><X size={24} /></button>
-              </div>
-
-              <div className="flex-1 space-y-8">
-                <Link to="/" onClick={() => setIsOpen(false)} className="block text-4xl font-black tracking-tighter hover:text-lime-500 transition-colors">Home</Link>
-                <Link to="/products" onClick={() => setIsOpen(false)} className="block text-4xl font-black tracking-tighter hover:text-lime-500 transition-colors">Shop</Link>
-                <Link to="/contact" onClick={() => setIsOpen(false)} className="block text-4xl font-black tracking-tighter hover:text-lime-500 transition-colors">Contact</Link>
-              </div>
-
-              <div className="border-t border-gray-100 pt-8 space-y-4">
-                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Connect with us</p>
-                <div className="flex space-x-6">
-                  {['Instagram', 'Twitter', 'Facebook'].map(social => (
-                    <span key={social} className="text-sm font-bold hover:text-lime-500 cursor-pointer">{social}</span>
-                  ))}
+              <div>
+                <div className="flex justify-between items-center pb-8">
+                  <Link 
+                    to="/" 
+                    onClick={() => setIsOpen(false)} 
+                    className="font-display font-extrabold text-2xl tracking-tight uppercase"
+                  >
+                    ZARE
+                  </Link>
+                  <button onClick={() => setIsOpen(false)} className="p-2 text-[#111111]">
+                    <X size={22} />
+                  </button>
                 </div>
+
+                <div className="mt-8 space-y-6">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-[#8E8A82] font-semibold block">
+                    Navigation
+                  </span>
+                  <div className="space-y-4">
+                    <Link 
+                      to="/" 
+                      onClick={() => setIsOpen(false)} 
+                      className="block font-display text-3xl font-bold tracking-tight text-[#111111] hover:text-[#6B665F]"
+                    >
+                      Home
+                    </Link>
+                    <Link 
+                      to="/products" 
+                      onClick={() => setIsOpen(false)} 
+                      className="block font-display text-3xl font-bold tracking-tight text-[#111111] hover:text-[#6B665F]"
+                    >
+                      All Collections
+                    </Link>
+                    <Link 
+                      to="/products?cat=Shirts" 
+                      onClick={() => setIsOpen(false)} 
+                      className="block font-display text-3xl font-bold tracking-tight text-[#111111] hover:text-[#6B665F]"
+                    >
+                      Shirts & Linen
+                    </Link>
+                    <Link 
+                      to="/products?cat=Outerwear" 
+                      onClick={() => setIsOpen(false)} 
+                      className="block font-display text-3xl font-bold tracking-tight text-[#111111] hover:text-[#6B665F]"
+                    >
+                      Outerwear & Wool
+                    </Link>
+                    <Link 
+                      to="/contact" 
+                      onClick={() => setIsOpen(false)} 
+                      className="block font-display text-3xl font-bold tracking-tight text-[#111111] hover:text-[#6B665F]"
+                    >
+                      Atelier & Contact
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 space-y-3 text-xs text-[#6B665F]">
+                <p className="font-medium">Curated contemporary apparel.</p>
+                <p className="text-[11px] text-[#8E8A82]">Designed for permanence, not seasons.</p>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Search Overlay */}
+      {/* Editorial Search Overlay */}
       <AnimatePresence>
         {isSearchOpen && (
           <>
@@ -133,37 +216,58 @@ export default function Navbar() {
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }}
               onClick={() => setIsSearchOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
+              className="fixed inset-0 bg-black/40 z-[90]"
             />
             <motion.div
-              initial={{ y: -100 }} 
-              animate={{ y: 0 }} 
-              exit={{ y: -100 }}
-              className="fixed top-0 left-0 right-0 bg-white z-[100] shadow-2xl pb-8"
+              initial={{ y: -40, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              exit={{ y: -40, opacity: 0 }}
+              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
+              className="fixed top-0 left-0 right-0 bg-[#F7F6F2] z-[100] pb-10"
             >
-              <div className="max-w-4xl mx-auto px-4">
-                <div className="h-24 flex items-center">
-                  <Search size={24} className="text-gray-400 mr-4" />
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
+                <div className="h-20 flex items-center bg-[#EFECE6] px-6">
+                  <Search size={22} className="text-[#8E8A82] mr-4 shrink-0" />
                   <input 
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="What are you looking for?" 
-                    className="flex-1 outline-none text-2xl font-black tracking-tight"
+                    placeholder="Search by garment, fabric, or category..." 
+                    className="flex-1 bg-transparent outline-none font-display text-xl sm:text-2xl text-[#111111] placeholder:text-[#A8A49C]"
                     onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(searchQuery)}
                   />
-                  <button onClick={() => setIsSearchOpen(false)} className="p-2 hover:bg-gray-100 rounded-full ml-4">
-                    <X size={28} />
+                  <button 
+                    onClick={() => setIsSearchOpen(false)} 
+                    className="p-2 text-[#111111] hover:text-[#6B665F] transition-colors ml-4"
+                  >
+                    <X size={24} />
                   </button>
                 </div>
 
-                {/* Suggestions */}
-                {searchQuery.length > 1 && (
-                  <div className="py-4 border-t border-gray-100">
+                {/* Popular Keywords / Instant Results */}
+                {searchQuery.length <= 1 ? (
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <span className="text-[11px] uppercase tracking-[0.14em] text-[#8E8A82] font-semibold mr-2">
+                      Suggested:
+                    </span>
+                    {['Linen Shirt', 'Virgin Wool', 'Oxford', 'Denim', 'Overcoat'].map((keyword) => (
+                      <button
+                        key={keyword}
+                        onClick={() => handleSearchSubmit(keyword)}
+                        className="text-xs font-medium px-3.5 py-1.5 bg-[#EFECE6] hover:bg-[#E5E1D8] text-[#111111] transition-colors"
+                      >
+                        {keyword}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-8">
                     {suggestions.length > 0 ? (
                       <div className="space-y-4">
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Suggestions</span>
-                        <div className="grid grid-cols-1 gap-4">
+                        <span className="text-[11px] uppercase tracking-[0.14em] text-[#8E8A82] font-semibold block">
+                          Matching Pieces ({suggestions.length})
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {suggestions.map(p => (
                             <button 
                               key={p.id}
@@ -172,33 +276,38 @@ export default function Navbar() {
                                 setSearchQuery('');
                                 navigate(`/product/${p.id}`);
                               }}
-                              className="flex items-center space-x-4 p-2 hover:bg-gray-50 rounded-2xl transition-colors text-left group"
+                              className="flex items-center space-x-4 p-3 bg-[#EFECE6] hover:bg-[#E5E1D8] text-left transition-colors group"
                             >
-                              <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
-                                <img src={p.image} className="w-full h-full object-cover" />
+                              <div className="w-16 h-20 bg-[#ECE8E1] overflow-hidden shrink-0">
+                                <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold group-hover:text-lime-600 transition-colors truncate">{p.name}</h4>
-                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{p.category}</p>
+                                <span className="text-[10px] text-[#8E8A82] uppercase tracking-[0.1em] font-semibold block">
+                                  {p.category}
+                                </span>
+                                <h4 className="font-semibold text-sm text-[#111111] truncate group-hover:underline">
+                                  {p.name}
+                                </h4>
+                                <span className="text-xs font-bold text-[#111111] mt-1 block">
+                                  ₹{p.price.toLocaleString('en-IN')}
+                                </span>
                               </div>
-                              <span className="font-black text-lime-600">${p.price}</span>
-                              <ArrowRight size={16} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <ArrowUpRight size={16} className="text-[#8E8A82] opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
                           ))}
                         </div>
-                        <div className="mt-8 pt-6 border-t border-gray-50 flex justify-center">
+                        <div className="pt-6 flex justify-center">
                           <button 
                             onClick={() => handleSearchSubmit(searchQuery)}
-                            className="text-xs font-black uppercase tracking-widest flex items-center space-x-2 text-gray-400 hover:text-black transition-colors"
+                            className="text-xs font-semibold uppercase tracking-[0.12em] text-[#111111] hover:underline"
                           >
-                            <span>View all results for "{searchQuery}"</span>
-                            <ArrowRight size={14} />
+                            View all results for "{searchQuery}" →
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-gray-400 font-bold italic">
-                        No results found for "{searchQuery}"
+                      <div className="text-center py-10 text-[#6B665F] font-medium text-sm">
+                        No pieces found matching "{searchQuery}".
                       </div>
                     )}
                   </div>
@@ -208,6 +317,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   );
 }

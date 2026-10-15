@@ -5,16 +5,15 @@
 
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext.tsx';
-import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ChevronRight, CreditCard, Truck, Wallet } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate, Link } from 'react-router-dom';
+import { CheckCircle2, CreditCard, Truck, Wallet, ShieldCheck } from 'lucide-react';
 
 export default function Checkout() {
   const { cart, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    name: '', email: '', address: '', phone: '', method: 'card'
+    name: '', email: '', address: '', city: '', postal: '', phone: '', method: 'card'
   });
 
   if (cart.length === 0 && !isSuccess) {
@@ -30,145 +29,254 @@ export default function Checkout() {
     }, 100);
   };
 
-  return (
-    <div className="pt-24 pb-24 px-4 bg-white min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-5xl font-black mb-12 tracking-tighter uppercase text-center">Checkout</h1>
+  if (isSuccess) {
+    return (
+      <div className="pt-36 pb-32 px-4 bg-[#F7F6F2] min-h-svh text-[#111111]">
+        <div className="max-w-md mx-auto text-center space-y-6 bg-[#EFECE6] p-10">
+          <div className="w-12 h-12 bg-[#111111] text-[#F7F6F2] flex items-center justify-center mx-auto">
+            <CheckCircle2 size={24} />
+          </div>
+          
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.16em] text-[#736E67] font-semibold block mb-1">
+              Order Confirmed
+            </span>
+            <h1 className="font-display font-extrabold text-3xl uppercase tracking-tight text-[#111111]">
+              Thank You
+            </h1>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Shipping Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <p className="text-sm text-[#6B665F] leading-relaxed">
+            Your archive request has been placed and received by our atelier dispatch. A confirmation email with tracking credentials has been sent.
+          </p>
+
+          <div className="pt-4 text-xs text-[#736E67] space-y-1">
+            <p>Order Reference: <span className="font-semibold tracking-[0.08em] text-[#111111]">ZR-{Math.floor(100000 + Math.random() * 900000)}</span></p>
+            <p>Estimated Dispatch: 24 - 48 Hours</p>
+          </div>
+
+          <div className="pt-4">
+            <Link 
+              to="/products"
+              className="block w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors"
+            >
+              Continue to Archive
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111] min-h-svh">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-12 pb-4">
+          <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#736E67] block mb-1">
+            Secure Atelier Transaction
+          </span>
+          <h1 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-[-0.03em] text-[#111111]">
+            Checkout
+          </h1>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Checkout Form */}
+          <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-10">
+            
+            {/* Step 1: Shipping Address */}
             <section className="space-y-6">
-              <h3 className="text-xl font-bold flex items-center space-x-2">
-                <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm">1</span>
-                <span>Shipping Information</span>
-              </h3>
-              <div className="space-y-4">
-                <input 
-                  required 
-                  placeholder="Full Name" 
-                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-black border-2 outline-none transition-all font-medium"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                />
-                <input 
-                  required type="email" placeholder="Email Address" 
-                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-black border-2 outline-none transition-all font-medium"
-                  value={formData.email}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
-                />
-                <input 
-                  required placeholder="Shipping Address" 
-                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-black border-2 outline-none transition-all font-medium"
-                  value={formData.address}
-                  onChange={e => setFormData({ ...formData, address: e.target.value })}
-                />
-                <input 
-                  required type="tel" placeholder="Phone Number" 
-                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-black border-2 outline-none transition-all font-medium"
-                  value={formData.phone}
-                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                />
+              <div className="flex items-center space-x-3 pb-2">
+                <span className="w-6 h-6 bg-[#111111] text-[#F7F6F2] text-xs font-bold flex items-center justify-center">
+                  1
+                </span>
+                <h2 className="font-display font-bold text-lg uppercase tracking-tight text-[#111111]">
+                  Shipping Credentials
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Full Name *
+                  </label>
+                  <input 
+                    required 
+                    placeholder="Recipient name" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Email Address *
+                  </label>
+                  <input 
+                    required 
+                    type="email" 
+                    placeholder="name@domain.com" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Street Address *
+                  </label>
+                  <input 
+                    required 
+                    placeholder="House/Apartment, Street name" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.address}
+                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    City *
+                  </label>
+                  <input 
+                    required 
+                    placeholder="City" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.city}
+                    onChange={e => setFormData({ ...formData, city: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Postal Code *
+                  </label>
+                  <input 
+                    required 
+                    placeholder="PIN / Postal Code" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.postal}
+                    onChange={e => setFormData({ ...formData, postal: e.target.value })}
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#736E67] block mb-1.5">
+                    Contact Phone Number *
+                  </label>
+                  <input 
+                    required 
+                    type="tel" 
+                    placeholder="+91 / International number" 
+                    className="w-full px-4 py-3 bg-[#EFECE6] text-sm text-[#111111] outline-none transition-colors"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
               </div>
             </section>
 
+            {/* Step 2: Payment Method */}
             <section className="space-y-6">
-              <h3 className="text-xl font-bold flex items-center space-x-2">
-                <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm">2</span>
-                <span>Payment Method</span>
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="flex items-center space-x-3 pb-2">
+                <span className="w-6 h-6 bg-[#111111] text-[#F7F6F2] text-xs font-bold flex items-center justify-center">
+                  2
+                </span>
+                <h2 className="font-display font-bold text-lg uppercase tracking-tight text-[#111111]">
+                  Payment Protocol
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
                 {[
-                  { id: 'card', icon: <CreditCard />, label: 'Card' },
-                  { id: 'upi', icon: <Wallet />, label: 'UPI' },
-                  { id: 'cod', icon: <Truck />, label: 'COD' }
+                  { id: 'card', icon: <CreditCard size={18} />, label: 'Card' },
+                  { id: 'upi', icon: <Wallet size={18} />, label: 'UPI' },
+                  { id: 'cod', icon: <Truck size={18} />, label: 'COD' }
                 ].map(method => (
                   <button
                     key={method.id}
                     type="button"
                     onClick={() => setFormData({ ...formData, method: method.id })}
-                    className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center space-y-2 ${
-                      formData.method === method.id ? 'border-black bg-black text-white shadow-xl translate-y-[-4px]' : 'border-gray-100 bg-gray-50'
+                    className={`p-4 transition-colors flex flex-col items-center justify-center space-y-2 text-xs font-semibold uppercase tracking-[0.1em] ${
+                      formData.method === method.id 
+                        ? 'bg-[#111111] text-[#F7F6F2]' 
+                        : 'bg-[#EFECE6] text-[#111111] hover:bg-[#E5E1D8]'
                     }`}
                   >
                     {method.icon}
-                    <span className="text-xs font-bold uppercase">{method.label}</span>
+                    <span>{method.label}</span>
                   </button>
                 ))}
               </div>
+
+              <div className="bg-[#EFECE6] p-4 text-xs text-[#6B665F]">
+                {formData.method === 'card' && 'Major credit/debit cards accepted. 256-bit encrypted checkout.'}
+                {formData.method === 'upi' && 'Instant payment via Google Pay, PhonePe, Paytm, or any UPI ID.'}
+                {formData.method === 'cod' && 'Cash on delivery available with pin code verification upon arrival.'}
+              </div>
             </section>
 
-            <button type="submit" className="w-full bg-lime-400 text-black py-6 rounded-full font-black uppercase text-sm tracking-widest shadow-xl hover:bg-black hover:text-white transition-all transform hover:scale-[1.02]">
-              Place Order ₹{totalPrice.toLocaleString('en-IN')}
-            </button>
+            <div>
+              <button
+                type="submit"
+                className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors"
+              >
+                Place Order · ₹{totalPrice.toLocaleString('en-IN')}
+              </button>
+            </div>
           </form>
 
-          {/* Order Summary */}
-          <div className="space-y-8">
-            <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100">
-              <h3 className="text-xl font-bold mb-6">Your Order</h3>
-              <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4 mb-6">
-                {cart.map(item => (
-                  <div key={item.id} className="flex items-center space-x-4">
-                    <div className="w-16 h-20 bg-white rounded-lg overflow-hidden shrink-0">
-                      <img src={item.image} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm truncate">{item.name}</h4>
-                      <p className="text-xs text-gray-400 font-medium">Qty: {item.quantity}</p>
-                    </div>
-                    <span className="font-bold">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-5 bg-[#EFECE6] p-8 space-y-6">
+            <h3 className="font-display font-bold text-xl uppercase tracking-tight text-[#111111] pb-2">
+              Order Contents ({cart.length})
+            </h3>
+
+            <div className="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
+              {cart.map(item => (
+                <div key={item.id} className="p-3 bg-[#F7F6F2] flex items-center space-x-4">
+                  <div className="w-14 aspect-[3/4] bg-[#ECE8E1] shrink-0 overflow-hidden">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
-                ))}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-xs text-[#111111] truncate">{item.name}</h4>
+                    <span className="text-[10px] text-[#736E67] uppercase tracking-[0.08em] block">
+                      Qty: {item.quantity} · {item.category}
+                    </span>
+                  </div>
+                  <span className="font-bold text-xs text-[#111111] shrink-0">
+                    ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 space-y-2.5 text-xs">
+              <div className="flex justify-between text-[#6B665F]">
+                <span>Subtotal</span>
+                <span className="text-[#111111] font-semibold">₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
-              <div className="space-y-4 pt-6 border-t border-gray-200">
-                <div className="flex justify-between font-medium">
-                  <span className="text-gray-500">Shipping</span>
-                  <span className="text-lime-600 font-bold uppercase text-xs">Free</span>
-                </div>
-                <div className="flex justify-between font-black text-2xl pt-2">
-                  <span>Total</span>
-                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
-                </div>
+              <div className="flex justify-between text-[#6B665F]">
+                <span>Shipping</span>
+                <span className="text-[#111111] font-semibold uppercase tracking-[0.06em]">Complimentary</span>
+              </div>
+              <div className="flex justify-between font-display font-bold text-xl text-[#111111] pt-4">
+                <span>Total</span>
+                <span>₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
+
+            <div className="text-[11px] text-[#736E67] pt-4 flex items-center space-x-2">
+              <ShieldCheck size={16} className="shrink-0 text-[#111111]" />
+              <span>Protected by certified end-to-end checkout encryption</span>
+            </div>
           </div>
+
         </div>
       </div>
-
-      {/* Success Modal */}
-      <AnimatePresence>
-        {isSuccess && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative bg-white p-12 rounded-[3.5rem] max-w-lg w-full text-center shadow-2xl"
-            >
-              <div className="w-24 h-24 bg-lime-400 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                <CheckCircle2 size={48} className="text-black" />
-              </div>
-              <h2 className="text-4xl font-black mb-4 tracking-tighter uppercase">Order Success!</h2>
-              <p className="text-gray-500 text-lg mb-10">
-                Thank you, {formData.name}! Your order has been placed successfully. We'll email your receipt to {formData.email}.
-              </p>
-              <button 
-                onClick={() => navigate('/')}
-                className="w-full bg-black text-white py-5 rounded-full font-black uppercase text-sm tracking-widest hover:bg-lime-500 hover:text-black transition-all"
-              >
-                Return Home
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
