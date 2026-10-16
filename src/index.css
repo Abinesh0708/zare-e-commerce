@@ -39,6 +39,9 @@ body {
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  overscroll-behavior-y: none;
 }
 
 ::selection {
@@ -50,4 +53,27 @@ h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   letter-spacing: -0.035em;
+}
+
+/* Ensure all interactive elements have a minimum 44px touch target */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Override for inline/small decorative elements */
+nav a, footer a {
+  min-height: unset;
+  min-width: unset;
+}
+
+/* Safe area padding for notched devices */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }

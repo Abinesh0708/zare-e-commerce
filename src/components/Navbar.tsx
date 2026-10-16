@@ -48,7 +48,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#F7F6F2] transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
         
         {/* Left: Mobile Menu & Desktop Navigation */}
         <div className="flex items-center space-x-8">
@@ -223,24 +223,24 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1 }} 
               exit={{ y: -40, opacity: 0 }}
               transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
-              className="fixed top-0 left-0 right-0 bg-[#F7F6F2] z-[100] pb-10"
+              className="fixed top-0 left-0 right-0 bg-[#F7F6F2] z-[100] pb-8 sm:pb-10"
             >
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
-                <div className="h-20 flex items-center bg-[#EFECE6] px-6">
-                  <Search size={22} className="text-[#8E8A82] mr-4 shrink-0" />
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
+                <div className="h-16 sm:h-20 flex items-center bg-[#EFECE6] px-4 sm:px-6">
+                  <Search size={20} className="text-[#8E8A82] mr-3 sm:mr-4 shrink-0" />
                   <input 
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by garment, fabric, or category..." 
-                    className="flex-1 bg-transparent outline-none font-display text-xl sm:text-2xl text-[#111111] placeholder:text-[#A8A49C]"
+                    className="flex-1 bg-transparent outline-none font-display text-lg sm:text-2xl text-[#111111] placeholder:text-[#A8A49C]"
                     onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(searchQuery)}
                   />
                   <button 
                     onClick={() => setIsSearchOpen(false)} 
-                    className="p-2 text-[#111111] hover:text-[#6B665F] transition-colors ml-4"
+                    className="p-2 text-[#111111] hover:text-[#6B665F] transition-colors ml-2 sm:ml-4"
                   >
-                    <X size={24} />
+                    <X size={22} />
                   </button>
                 </div>
 

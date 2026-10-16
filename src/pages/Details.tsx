@@ -61,44 +61,26 @@ export default function Details() {
   const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
 
   return (
-    <div id="product-detail" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111]">
+    <div id="product-detail" className="pt-20 sm:pt-28 pb-24 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111]">
       <div className="max-w-7xl mx-auto">
         
         {/* Breadcrumb Navigation */}
-        <nav className="flex items-center space-x-2 text-xs uppercase tracking-[0.12em] text-[#736E67] mb-8">
-          <Link to="/" className="hover:text-[#111111]">Home</Link>
-          <span>/</span>
-          <Link to="/products" className="hover:text-[#111111]">Collections</Link>
-          <span>/</span>
-          <Link to={`/products?cat=${product.category}`} className="hover:text-[#111111]">{product.category}</Link>
-          <span>/</span>
-          <span className="text-[#111111] font-semibold truncate max-w-[200px]">{product.name}</span>
+        <nav className="flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-[0.12em] text-[#736E67] mb-6 sm:mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
+          <Link to="/" className="hover:text-[#111111] shrink-0">Home</Link>
+          <span className="shrink-0">/</span>
+          <Link to="/products" className="hover:text-[#111111] shrink-0">Collections</Link>
+          <span className="shrink-0">/</span>
+          <Link to={`/products?cat=${product.category}`} className="hover:text-[#111111] shrink-0">{product.category}</Link>
+          <span className="shrink-0">/</span>
+          <span className="text-[#111111] font-semibold truncate">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Multi-Angle Studio Photography */}
-          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
-            
-            {/* Thumbnail Column */}
-            {imagesList.length > 1 && (
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto no-scrollbar shrink-0">
-                {imagesList.map((img, i) => (
-                  <button 
-                    key={i} 
-                    onClick={() => setSelectedImage(i)}
-                    className={`relative w-20 md:w-24 aspect-[3/4] bg-[#ECE8E1] overflow-hidden transition-opacity duration-200 ${
-                      selectedImage === i ? 'opacity-100 ring-2 ring-[#111111]' : 'opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt={`Angle ${i + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-
+          <div className="lg:col-span-7">
             {/* Main Stage Image */}
-            <div className="flex-1 aspect-[3/4] bg-[#ECE8E1] overflow-hidden relative">
+            <div className="aspect-[3/4] sm:aspect-[3/4] bg-[#ECE8E1] overflow-hidden relative mb-3">
               <AnimatePresence mode="wait">
                 <motion.img 
                   key={selectedImage}
@@ -119,12 +101,28 @@ export default function Details() {
               )}
             </div>
 
+            {/* Thumbnail Strip — horizontal on mobile, vertical on md+ */}
+            {imagesList.length > 1 && (
+              <div className="flex flex-row gap-2 overflow-x-auto no-scrollbar">
+                {imagesList.map((img, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setSelectedImage(i)}
+                    className={`relative w-16 sm:w-20 aspect-[3/4] bg-[#ECE8E1] overflow-hidden shrink-0 transition-opacity duration-200 ${
+                      selectedImage === i ? 'opacity-100 ring-2 ring-[#111111]' : 'opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`Angle ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Garment Specifications & Actions */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-6 sm:space-y-8">
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#736E67]">
                 <span>{product.category}</span>
                 <span className="font-semibold text-[#111111] flex items-center">
@@ -133,21 +131,21 @@ export default function Details() {
                 </span>
               </div>
 
-              <h1 className="font-display font-extrabold text-3xl sm:text-4xl uppercase tracking-[-0.03em] text-[#111111] leading-tight">
+              <h1 className="font-display font-extrabold text-2xl sm:text-4xl uppercase tracking-[-0.03em] text-[#111111] leading-tight">
                 {product.name}
               </h1>
 
               {/* Price Display */}
-              <div className="flex items-baseline space-x-3 pt-1">
-                <span className="font-display font-bold text-3xl text-[#111111]">
+              <div className="flex items-baseline flex-wrap gap-2 pt-1">
+                <span className="font-display font-bold text-2xl sm:text-3xl text-[#111111]">
                   ₹{product.price.toLocaleString('en-IN')}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-[#8E8A82] line-through text-lg">
+                  <span className="text-[#8E8A82] line-through text-base sm:text-lg">
                     ₹{product.originalPrice.toLocaleString('en-IN')}
                   </span>
                 )}
-                <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 ml-2 ${
+                <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 ${
                   product.stockStatus === 'In Stock' 
                     ? 'bg-[#EFECE6] text-[#111111]' 
                     : 'bg-[#A64B2A] text-[#F7F6F2]'
@@ -156,20 +154,20 @@ export default function Details() {
                 </span>
               </div>
 
-              <p className="text-sm sm:text-base text-[#6B665F] leading-relaxed pt-2">
+              <p className="text-sm text-[#6B665F] leading-relaxed pt-1">
                 {product.description}
               </p>
             </div>
 
             {/* Quantity Selector */}
-            <div className="pt-6 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-[0.14em] font-semibold text-[#736E67]">
                 Quantity
               </span>
               <div className="flex items-center bg-[#EFECE6]">
                 <button 
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3.5 py-2 hover:bg-[#E5E1D8] text-[#111111] transition-colors"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-[#E5E1D8] text-[#111111] transition-colors touch-manipulation"
                   aria-label="Decrease quantity"
                 >
                   <Minus size={14} />
@@ -179,7 +177,7 @@ export default function Details() {
                 </span>
                 <button 
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3.5 py-2 hover:bg-[#E5E1D8] text-[#111111] transition-colors"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-[#E5E1D8] text-[#111111] transition-colors touch-manipulation"
                   aria-label="Increase quantity"
                 >
                   <Plus size={14} />
@@ -242,14 +240,14 @@ export default function Details() {
       </div>
 
       {/* Mobile Sticky Add to Bag Bar */}
-      <div data-ui="mobile-add-bar" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F6F2] p-3 border-t border-[#E0DDD6] flex items-center justify-between gap-3 shadow-lg">
+      <div data-ui="mobile-add-bar" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F6F2]/95 backdrop-blur-sm p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-[#E0DDD6] flex items-center justify-between gap-3 shadow-lg">
         <div className="flex flex-col pl-1">
           <span className="font-bold text-sm text-[#111111]">₹{product.price.toLocaleString('en-IN')}</span>
           <span className="text-[10px] text-[#736E67] uppercase tracking-[0.08em]">{product.stockStatus}</span>
         </div>
         <button 
           onClick={() => addToCart(product, quantity)}
-          className="flex-1 bg-[#111111] text-[#F7F6F2] py-3.5 px-4 text-xs font-semibold uppercase tracking-[0.14em] flex items-center justify-center space-x-2 active:bg-[#2B2B2B]"
+          className="flex-1 bg-[#111111] text-[#F7F6F2] py-3.5 px-4 text-xs font-semibold uppercase tracking-[0.14em] flex items-center justify-center space-x-2 active:bg-[#2B2B2B] touch-manipulation"
         >
           <span>Add to Bag</span>
         </button>

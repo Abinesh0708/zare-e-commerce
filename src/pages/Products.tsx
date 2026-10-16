@@ -66,17 +66,17 @@ export default function Products() {
   const categories = (['All', ...Array.from(new Set(products.map(p => p.category)))].sort()) as string[];
 
   return (
-    <div id="products-page" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 min-h-svh bg-[#F7F6F2] text-[#111111]">
+    <div id="products-page" className="pt-20 sm:pt-28 pb-24 px-4 sm:px-6 lg:px-8 min-h-svh bg-[#F7F6F2] text-[#111111]">
       <div className="max-w-7xl mx-auto">
         
         {/* Editorial Collection Header */}
-        <header className="mb-14 pb-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <header className="mb-10 sm:mb-14 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
             <div>
               <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#736E67] block mb-2">
                 Atelier Catalog
               </span>
-              <h1 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-[-0.04em] text-[#111111]">
+              <h1 className="font-display font-extrabold text-[clamp(2rem,8vw,4.5rem)] uppercase tracking-[-0.04em] text-[#111111] leading-tight">
                 {category === 'All' ? 'Permanent Archive' : category}
               </h1>
               {query && (

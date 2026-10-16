@@ -45,14 +45,14 @@ export default function Cart() {
   }
 
   return (
-    <div id="cart-page" className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111] min-h-svh">
+    <div id="cart-page" className="pt-24 sm:pt-28 pb-28 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F2] text-[#111111] min-h-svh">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-10 pb-4 flex justify-between items-end">
+        <header className="mb-8 sm:mb-10 pb-4 flex justify-between items-end">
           <div>
             <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#736E67] block mb-1">
               Order Review
             </span>
-            <h1 className="font-display font-extrabold text-3xl sm:text-5xl uppercase tracking-[-0.03em] text-[#111111]">
+            <h1 className="font-display font-extrabold text-2xl sm:text-5xl uppercase tracking-[-0.03em] text-[#111111]">
               Shopping Bag
             </h1>
           </div>
@@ -60,11 +60,54 @@ export default function Cart() {
             {cart.reduce((sum, item) => sum + item.quantity, 0)} Items
           </span>
         </header>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+
+          {/* Order Summary — appears first on mobile, sidebar on desktop */}
+          <div className="lg:col-span-4 lg:order-2">
+            <div className="bg-[#EFECE6] p-6 sm:p-8 lg:sticky lg:top-28 space-y-6">
+              <h3 className="font-display font-bold text-xl uppercase tracking-tight text-[#111111] pb-2">
+                Summary
+              </h3>
+              
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Subtotal</span>
+                  <span className="text-[#111111] font-semibold">₹{totalPrice.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Atelier Dispatch</span>
+                  <span className="text-[#111111] font-semibold uppercase tracking-[0.08em] text-xs">Complimentary</span>
+                </div>
+                <div className="flex justify-between text-[#6B665F]">
+                  <span>Applicable Taxes</span>
+                  <span className="text-[#111111] font-semibold text-xs">Included</span>
+                </div>
+                
+                <div className="flex justify-between font-display font-bold text-2xl text-[#111111] pt-6">
+                  <span>Total</span>
+                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button 
+                  onClick={() => navigate('/checkout')}
+                  className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] active:scale-[0.98] transition-all touch-manipulation"
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+
+              <div className="text-[11px] text-[#736E67] space-y-1.5 pt-4">
+                <p>• Secured 256-bit payment processing</p>
+                <p>• 14-day return and exchange policy</p>
+                <p>• Sourced under fair atelier standards</p>
+              </div>
+            </div>
+          </div>
+
           {/* Cart Items Column */}
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-8 lg:order-1 space-y-3 sm:space-y-4">
             {cart.map((item) => (
               <motion.div 
                 key={item.id}
@@ -102,18 +145,18 @@ export default function Cart() {
                     <div className="flex items-center bg-[#F7F6F2]">
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="px-2 py-1 text-[#111111] hover:bg-[#E5E1D8] transition-colors"
+                        className="w-9 h-9 flex items-center justify-center text-[#111111] hover:bg-[#E5E1D8] transition-colors touch-manipulation"
                       >
-                        <Minus size={11} />
+                        <Minus size={12} />
                       </button>
-                      <span className="w-7 text-center font-bold text-xs text-[#111111]">
+                      <span className="w-8 text-center font-bold text-xs text-[#111111]">
                         {item.quantity}
                       </span>
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="px-2 py-1 text-[#111111] hover:bg-[#E5E1D8] transition-colors"
+                        className="w-9 h-9 flex items-center justify-center text-[#111111] hover:bg-[#E5E1D8] transition-colors touch-manipulation"
                       >
-                        <Plus size={11} />
+                        <Plus size={12} />
                       </button>
                     </div>
 
@@ -125,62 +168,18 @@ export default function Cart() {
               </motion.div>
             ))}
 
-            {/* Suggestions / Complementary Pieces */}
-            <div className="pt-12 sm:pt-16">
+            {/* Curated Suggestions */}
+            <div className="pt-10 sm:pt-16">
               <span className="text-[11px] uppercase tracking-[0.16em] font-semibold text-[#736E67] block mb-2">
                 Curated Suggestions
               </span>
-              <h3 className="font-display font-bold text-xl sm:text-2xl uppercase tracking-tight text-[#111111] mb-6 sm:mb-8">
+              <h3 className="font-display font-bold text-lg sm:text-2xl uppercase tracking-tight text-[#111111] mb-6">
                 Complementary Archive Items
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
                 {suggested.map(p => (
                   <ProductCard key={p.id} product={p} />
                 ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Order Summary Column */}
-          <div className="lg:col-span-4">
-            <div className="bg-[#EFECE6] p-8 sticky top-28 space-y-6">
-              <h3 className="font-display font-bold text-xl uppercase tracking-tight text-[#111111] pb-2">
-                Summary
-              </h3>
-              
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-[#6B665F]">
-                  <span>Subtotal</span>
-                  <span className="text-[#111111] font-semibold">₹{totalPrice.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-[#6B665F]">
-                  <span>Atelier Dispatch</span>
-                  <span className="text-[#111111] font-semibold uppercase tracking-[0.08em] text-xs">Complimentary</span>
-                </div>
-                <div className="flex justify-between text-[#6B665F]">
-                  <span>Applicable Taxes</span>
-                  <span className="text-[#111111] font-semibold text-xs">Included</span>
-                </div>
-                
-                <div className="flex justify-between font-display font-bold text-2xl text-[#111111] pt-6">
-                  <span>Total</span>
-                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <button 
-                  onClick={() => navigate('/checkout')}
-                  className="w-full bg-[#111111] text-[#F7F6F2] py-4 text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#2B2B2B] transition-colors"
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
-
-              <div className="text-[11px] text-[#736E67] space-y-1.5 pt-4">
-                <p>• Secured 256-bit payment processing</p>
-                <p>• 14-day return and exchange policy</p>
-                <p>• Sourced under fair atelier standards</p>
               </div>
             </div>
           </div>
